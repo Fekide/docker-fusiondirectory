@@ -5,7 +5,7 @@
         -e LDAP_DOMAIN="example.org" \
         -e LDAP_HOST="ldap.example.org" \
         -e LDAP_ADMIN_PASSWORD="password" \
-        -d hrektts/fusiondirectory:bats
+        -d fekide/fusiondirectory:bats
     [ "${status}" -eq 0 ]
     until curl --head localhost
     do
