@@ -2,7 +2,7 @@ version: '2'
 services:
   openldap:
     restart: always
-    image: hrektts/fusiondirectory-openldap:latest
+    image: fekide/fusiondirectory-openldap:latest
     environment:
       - LDAP_ORGANISATION="Example Organization"
       - LDAP_DOMAIN=example.org
@@ -15,9 +15,11 @@ services:
 
       - FD_ADMIN_PASSWORD=fdadminpwd
 
+      - LDAP_TLS=false
+
   fusiondirectory:
     restart: always
-    image: hrektts/fusiondirectory:latest
+    image: fekide/fusiondirectory:latest
     ports:
       - "10080:80"
     depends_on:
@@ -26,3 +28,4 @@ services:
       - LDAP_DOMAIN=example.org
       - LDAP_HOST=openldap
       - LDAP_ADMIN_PASSWORD=adminpwd
+      - LDAP_TLS=false

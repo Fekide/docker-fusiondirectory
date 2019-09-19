@@ -3,7 +3,7 @@
 Dockerfile to build a [FusionDirectory](https://www.fusiondirectory.org/)
 container image.
 
-[![Travis Build Status](https://travis-ci.org/hrektts/docker-fusiondirectory.svg?branch=master)](https://travis-ci.org/hrektts/docker-fusiondirectory)
+[![Travis Build Status](https://travis-ci.org/Fekide/docker-fusiondirectory.svg?branch=master)](https://travis-ci.org/Fekide/docker-fusiondirectory)
 
 
 ## Quick Start
