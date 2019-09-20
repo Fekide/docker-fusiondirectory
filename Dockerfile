@@ -1,6 +1,6 @@
 FROM nginx:latest
 LABEL maintainer="it@feki.de" \
-	version="0.2.1"
+	version="0.3.0"
 
 ENV FUSIONDIRECTORY_VERSION=1.3-1
 
