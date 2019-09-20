@@ -1,56 +1,61 @@
-#!/bin/bash
-set -e
+#!/bin/bash -e
 
-printf "Starting FusionDirectory ... ";
+echo "Starting FusionDirectory ... "
 
-LDAP_DOMAIN=${LDAP_ENV_LDAP_DOMAIN:-${LDAP_DOMAIN}}
-if [ -z ${LDAP_DOMAIN} ] ; then
-    printf "\n\nLDAP_DOMAIN is not defined!\n"
-    exit 1
-fi
+# Read environment variable from file -> for docker secrets 
+# (Source: https://github.com/docker-library/wordpress/blob/master/docker-entrypoint.sh)
+file_env() {
+	local var="$1"
+	local fileVar="${var}_FILE"
+	local def="${2:-}"
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+		exit 1
+	fi
+	local val="$def"
+	if [ "${!var:-}" ]; then
+		val="${!var}"
+	elif [ "${!fileVar:-}" ]; then
+		val="$(<"${!fileVar}")"
+	fi
+	echo ${val}
+	if [ -z ${val} ]; then
+		echo >&2 "error: neither $var nor $fileVar are set but are required"
+		exit 1
+	fi
+	export "$var"="$val"
+	unset "$fileVar"
+}
 
-LDAP_HOST=${LDAP_PORT_389_TCP_ADDR:-${LDAP_HOST}}
-if [ -z ${LDAP_HOST} ] ; then
-    printf "\n\nLDAP_HOST is not defined!\n"
-    exit 1
-fi
+required_envs=(
+	LDAP_DOMAIN
+	LDAP_HOST
+	LDAP_ADMIN_PASSWORD
+)
 
-LDAP_ADMIN_PASSWORD=${LDAP_ENV_LDAP_ADMIN_PASSWORD:-${LDAP_ADMIN_PASSWORD}}
-if [ -z ${LDAP_ADMIN_PASSWORD} ] ; then
-    printf "\n\nLDAP_ADMIN_PASSWORD is not defined!\n"
-    exit 1
-fi
-
-IFS='.' read -a domain_elems <<< "${LDAP_DOMAIN}"
-
-suffix=""
-for elem in "${domain_elems[@]}" ; do
-    if [ "x${suffix}" = x ] ; then
-        suffix="dc=${elem}"
-    else
-        suffix="${suffix},dc=${elem}"
-    fi
+for e in "${required_envs[@]}"; do
+	file_env "$e"
 done
 
-if [ -z ${LDAP_ADMIN_DN} ] ; then
-    BASE_DN="dc=$(echo ${LDAP_DOMAIN} | sed 's/^\.//; s/\.$//; s/\./,dc=/g')"
-    : ${LDAP_ADMIN:="admin"}
-    LDAP_ADMIN_DN="cn=${LDAP_ADMIN},${BASE_DN}"
+BASE_DN="dc=$(echo ${LDAP_DOMAIN} | sed 's/^\.//; s/\.$//; s/\./,dc=/g')"
 
-    printf "\n\nLDAP_ADMIN_DN is not defined and set to '${LDAP_ADMIN_DN}'\n"
+if [ -z ${LDAP_ADMIN_DN} ]; then
+	: ${LDAP_ADMIN:="admin"}
+	LDAP_ADMIN_DN="cn=${LDAP_ADMIN},${BASE_DN}"
+
+	printf "\n\nLDAP_ADMIN_DN is not defined and set to '${LDAP_ADMIN_DN}'\n"
 fi
 
-LDAP_TLS=${LDAP_TLS:-"false"}
-LDAP_TLS=${LDAP_ENV_LDAP_TLS:-${LDAP_TLS}}
+file_env LDAP_TLS "false"
+file_env LDAP_SCHEME "ldap"
+file_env LDAP_COMM_PORT 389
 
-LDAP_SCHEME=${LDAP_SCHEME:-"ldap"}
-LDAP_COMM_PORT=${LDAP_COMM_PORT:-389}
 if ${LDAP_TLS}; then
-    LDAP_SCHEME="ldaps"
-    LDAP_COMM_PORT=636
+	LDAP_SCHEME="ldaps"
+	LDAP_COMM_PORT=636
 fi
 
-cat <<EOF > /etc/fusiondirectory/fusiondirectory.conf
+cat <<EOF >/etc/fusiondirectory/fusiondirectory.conf
 <?xml version="1.0"?>
 <conf>
   <!-- Main section **********************************************************
@@ -71,7 +76,7 @@ cat <<EOF > /etc/fusiondirectory/fusiondirectory.conf
     <!-- Location definition -->
     <location name="default"
     >
-        <referral URI="${LDAP_SCHEME}://${LDAP_HOST}:${LDAP_COMM_PORT}/${suffix}"
+        <referral URI="${LDAP_SCHEME}://${LDAP_HOST}:${LDAP_COMM_PORT}/${BASE_DN}"
                         adminDn="${LDAP_ADMIN_DN}"
                         adminPassword="${LDAP_ADMIN_PASSWORD}" />
     </location>
