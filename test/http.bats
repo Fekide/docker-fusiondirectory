@@ -1,10 +1,7 @@
 #!/usr/bin/env bats
 
-function setup() {
-    docker swarm init
-}
-
 @test "initialize" {
+    docker swarm init
     run docker run --label bats-type="test" -p 8085:80 \
         -e LDAP_DOMAIN="example.org" \
         -e LDAP_HOST="ldap.example.org" \
@@ -74,5 +71,4 @@ function teardown() {
     SERVICE_IDS=/dev/null
     CONTAINER_IDS=/dev/null
     SECRET_IDS=/dev/null
-    docker swarm leave
 }
