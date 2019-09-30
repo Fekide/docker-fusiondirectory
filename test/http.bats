@@ -8,7 +8,7 @@
         -e LDAP_ADMIN_PASSWORD="password" \
         -d fekide/fusiondirectory:bats
     [ "${status}" -eq 0 ]
-    until curl --head localhost:8085/fusiondirectory
+    until curl --head localhost:8085
     do
         sleep 1
     done

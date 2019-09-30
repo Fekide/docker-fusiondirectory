@@ -40,7 +40,7 @@ docker run --name fusiondirectory -p 10080:80 --link ldap:ldap \
   -d fekide/fusiondirectory:latest
 ```
 
-Access `http://localhost:10080/fd` with your browser and login using the
+Access `http://localhost:10080` with your browser and login using the
 administrator account:
 
 - username: fd-admin
