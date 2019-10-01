@@ -11,7 +11,7 @@ container image.
 The easiest way to launch the container is using [docker-compose](https://docs.docker.com/compose/):
 
 ``` shell
-wget https://raw.githubusercontent.com/fekide/docker-fusiondirectory/master/docker-compose.yml
+wget https://raw.githubusercontent.com/fekide/docker-fusiondirectory/master/example/docker-compose.yml
 docker-compose up
 ```
 

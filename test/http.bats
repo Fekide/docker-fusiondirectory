@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 @test "initialize" {
-    docker swarm init
+    docker swarm init || echo "ignore error"
     run docker run --label bats-type="test" -p 8085:80 \
         -e LDAP_DOMAIN="example.org" \
         -e LDAP_HOST="ldap.example.org" \
