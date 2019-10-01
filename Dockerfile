@@ -67,7 +67,7 @@ RUN export TARGET=/etc/php/7.3/fpm/php.ini && \
 	unset TARGET
 
 RUN export TARGET=/etc/php/7.3/fpm/pool.d/www.conf && \
-	sed -i -e "s:^\(listen *= *\).*$:\1/run/php7.0-fpm.sock:" ${TARGET} && \
+	sed -i -e "s:^\(listen *= *\).*$:\1/run/php7.3-fpm.sock:" ${TARGET} && \
 	sed -i -e "s:^\(user *= *\).*$:\1nginx:" ${TARGET} && \
 	unset TARGET
 
