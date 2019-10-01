@@ -25,7 +25,7 @@ docker run -p 80:80 \
   -d fekide/fusiondirectory:latest
 ```
 
-Alternatively, you can link this container with previously launched LDAP
+Alternatively, you can link this container with a previously launched LDAP
 container image as follows:
 
 ``` shell
@@ -36,11 +36,14 @@ docker run --name ldap -p 389:389 \
   -e FD_ADMIN_PASSWORD="fdadminpassword" \
   -d fekide/fusiondirectory-openldap:latest
 
-docker run --name fusiondirectory -p 10080:80 --link ldap:ldap \
+docker run --name fusiondirectory -p 80:80 --link ldap:ldap \
+  -e LDAP_DOMAIN="example.org" \
+  -e LDAP_HOST="ldap" \
+  -e LDAP_ADMIN_PASSWORD="password" \
   -d fekide/fusiondirectory:latest
 ```
 
-Access `http://localhost:10080` with your browser and login using the
+Access `http://localhost:80` with your browser and login using the
 administrator account:
 
 - username: fd-admin
